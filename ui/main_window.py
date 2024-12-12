@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("ShadFlow - CPU Scheduler Visualizer")
         self.setGeometry(100, 100, 1400, 800)
-        self.setWindowIcon(QIcon("os project icon.png"))
+        self.setWindowIcon(QIcon("os project icon.ico"))
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QHBoxLayout(central_widget)

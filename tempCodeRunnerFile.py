@@ -1,2 +1,1 @@
-
-    palette.setColor(QPalette.ToolTipBase, QColor("#FFFFFF"))
+ShadFlow CPU Scheduler
