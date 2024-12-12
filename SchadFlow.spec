@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('visuals', 'visuals'), ('logic', 'logic'), ('ui', 'ui')],
+    datas=[('c:\\Users\\anase\\Semester 5 Project\\SchadFlow\\visuals', 'visuals'), ('c:\\Users\\anase\\Semester 5 Project\\SchadFlow\\logic', 'logic'), ('c:\\Users\\anase\\Semester 5 Project\\SchadFlow\\ui', 'ui')],
     hiddenimports=['PySide6.QtCore', 'matplotlib'],
     hookspath=[],
     hooksconfig={},
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['c:\\Users\\anase\\Semester 5 Project\\SchadFlow\\os project icon.ico'],
 )
