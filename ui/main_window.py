@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         dock_layout.addWidget(title_label, alignment=Qt.AlignCenter)
 
         github_label = QLabel(
-            '<a href="https://github.com/YourGitHubRepo/JobScheduler">View on GitHub</a>'
+            '<a href="https://github.com/a-elhaag/ShadFlow-CPU-Scheduler">View on GitHub</a>'
         )
         github_label.setOpenExternalLinks(True)
         github_label.setStyleSheet("font-size: 12px; color: #1E90FF;")
