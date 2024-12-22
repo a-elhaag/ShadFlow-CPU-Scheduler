@@ -11,7 +11,6 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QHeaderView,
-    QInputDialog,
     QLabel,
     QMainWindow,
     QMenu,
@@ -48,12 +47,7 @@ class MainWindow(QMainWindow):
             | QDockWidget.DockWidgetFloatable
             | QDockWidget.DockWidgetClosable
         )
-        self.left_dock.setAllowedAreas(
-            Qt.LeftDockWidgetArea
-            | Qt.RightDockWidgetArea
-            | Qt.TopDockWidgetArea
-            | Qt.BottomDockWidgetArea
-        )
+        self.left_dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.left_dock.visibilityChanged.connect(self.update_view_menu)
 
         dock_content = QWidget()
@@ -446,7 +440,6 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Example dark mode palette
     dark_palette = app.palette()
     dark_palette.setColor(dark_palette.Window, QColor(45, 45, 45))
     dark_palette.setColor(dark_palette.WindowText, QColor(255, 255, 255))
