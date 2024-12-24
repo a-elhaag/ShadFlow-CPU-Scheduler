@@ -10,9 +10,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     app.setApplicationName("ShadFlow CPU Scheduler")
-    # app.setWindowIcon(QIcon("icon.png"))  # Uncomment if you have an icon
-
-    # Set a dark palette
     dark_palette = QPalette()
     dark_color = QColor(45, 45, 45)
     nearly_black = QColor(35, 35, 35)
@@ -36,9 +33,6 @@ if __name__ == "__main__":
 
     app.setPalette(dark_palette)
 
-    # Optionally, you can also set a fusion style for a more consistent look:
-    # from PySide6.QtWidgets import QStyleFactory
-    # app.setStyle(QStyleFactory.create("Fusion"))
 
     window = MainWindow()
     window.show()
