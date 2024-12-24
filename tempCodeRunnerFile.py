@@ -1,1 +1,1 @@
-ShadFlow CPU Scheduler
+ys.exit(app.exec())
