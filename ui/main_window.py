@@ -76,7 +76,7 @@ class MainWindow(QMainWindow):
         self.algorithm_selector.addItems(
             ["FCFS", "SJF", "SRTF", "Priority", "Priority (Preemptive)", "Round Robin"]
         )
-        self.algorithm_selector.setStyleSheet("font-size: 13px;")
+        self.algorithm_selector.setStyleSheet("font-size: 13px; color: #000;")
         self.algorithm_selector.currentTextChanged.connect(self.on_algorithm_changed)
         dock_layout.addWidget(self.algorithm_selector)
 
