@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.patches import Rectangle
-from matplotlib import cm
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMenu
+
 
 class GanttChart(FigureCanvas):
     def __init__(self):
@@ -43,7 +44,9 @@ class GanttChart(FigureCanvas):
         self.hover_annotation.set_visible(False)
 
         # Vertical line and time annotation
-        self.vertical_line = self.ax.axvline(x=0, color="#FFD700", linewidth=1, alpha=0.8, linestyle="--", visible=False)
+        self.vertical_line = self.ax.axvline(
+            x=0, color="#FFD700", linewidth=1, alpha=0.8, linestyle="--", visible=False
+        )
         self.time_annotation = self.ax.annotate(
             "",
             xy=(0, -0.6),
@@ -63,11 +66,19 @@ class GanttChart(FigureCanvas):
         )
         self.time_annotation.set_visible(False)
 
-        self.cid_hover = self.figure.canvas.mpl_connect("motion_notify_event", self.on_hover)
-        self.cid_leave = self.figure.canvas.mpl_connect("axes_leave_event", self.on_leave)
-        self.cid_click = self.figure.canvas.mpl_connect("button_press_event", self.on_click)
+        self.cid_hover = self.figure.canvas.mpl_connect(
+            "motion_notify_event", self.on_hover
+        )
+        self.cid_leave = self.figure.canvas.mpl_connect(
+            "axes_leave_event", self.on_leave
+        )
+        self.cid_click = self.figure.canvas.mpl_connect(
+            "button_press_event", self.on_click
+        )
         self.cid_scroll = self.figure.canvas.mpl_connect("scroll_event", self.on_scroll)
-        self.cid_dblclick = self.figure.canvas.mpl_connect("button_release_event", self.on_double_click_release)
+        self.cid_dblclick = self.figure.canvas.mpl_connect(
+            "button_release_event", self.on_double_click_release
+        )
 
         self.last_click_time = None
         self.double_click_threshold = 0.3  # seconds for double click
@@ -75,18 +86,26 @@ class GanttChart(FigureCanvas):
         # Enable pan/zoom with mouse drag
         self.panning = False
         self.last_mouse_x = None
-        self.cid_press = self.figure.canvas.mpl_connect('button_press_event', self.on_button_press)
-        self.cid_release = self.figure.canvas.mpl_connect('button_release_event', self.on_button_release)
-        self.cid_motion = self.figure.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+        self.cid_press = self.figure.canvas.mpl_connect(
+            "button_press_event", self.on_button_press
+        )
+        self.cid_release = self.figure.canvas.mpl_connect(
+            "button_release_event", self.on_button_release
+        )
+        self.cid_motion = self.figure.canvas.mpl_connect(
+            "motion_notify_event", self.on_mouse_move
+        )
 
     def init_chart(self):
         self.ax.clear()
-        self.ax.set_title("Interactive Gantt Chart", fontsize=14, color='white', weight="bold")
-        self.ax.set_facecolor("#2e2e2e")
-        self.figure.patch.set_facecolor("#2e2e2e")
-        self.ax.title.set_color("white")
-        self.ax.tick_params(colors='white')
-        self.ax.xaxis.label.set_color('white')
+        self.ax.set_title(
+            "Interactive Gantt Chart", fontsize=16, color="#34AADC", weight="bold"
+        )
+        self.ax.set_facecolor("#1E1E1E")  # Darker background for better contrast
+        self.figure.patch.set_facecolor("#1E1E1E")
+        self.ax.title.set_color("#34AADC")  # Blue title for a modern look
+        self.ax.tick_params(colors="#E0E0E0")  # Light grey ticks for better visibility
+        self.ax.xaxis.label.set_color("#E0E0E0")
         for spine in self.ax.spines.values():
             spine.set_visible(False)
         self.ax.set_yticks([])
@@ -101,7 +120,7 @@ class GanttChart(FigureCanvas):
         max_finish_time = 0
 
         num_processes = len(set(p["Process"] for p in schedule))
-        colors = cm.get_cmap('viridis', num_processes)
+        colors = cm.get_cmap("plasma", num_processes)  # Updated to a vibrant color map
         process_colors = {}
         self.process_remaining_times = {}
 
@@ -123,9 +142,9 @@ class GanttChart(FigureCanvas):
                 width=executed_time,
                 left=start,
                 color=process_colors[proc_name],
-                edgecolor="white",
+                edgecolor="#FFFFFF",
                 height=0.5,
-                alpha=0.9,
+                alpha=0.95,
             )[0]
             self.bars.append((bar, process))
             remaining_time = self.process_remaining_times[proc_name] - executed_time
@@ -138,7 +157,7 @@ class GanttChart(FigureCanvas):
                 va="center",
                 fontsize=10,
                 weight="bold",
-                color="white",
+                color="#FFFFFF",
             )
 
         for time in sorted(time_points):
@@ -149,7 +168,7 @@ class GanttChart(FigureCanvas):
                 ha="center",
                 va="center",
                 fontsize=9,
-                color="white",
+                color="#E0E0E0",
             )
 
         self.ax.set_xlim(0, max_finish_time + 1)
@@ -176,7 +195,7 @@ class GanttChart(FigureCanvas):
                 bar, process = hovered_bar
                 proc_name = process["Process"]
                 rem_time = self.process_remaining_times.get(proc_name, 0)
-                executed_time = process['Finish'] - process['Start']
+                executed_time = process["Finish"] - process["Start"]
                 tooltip_text = (
                     f"Process: {proc_name}\n"
                     f"Start Time: {process['Start']}\n"
@@ -229,10 +248,11 @@ class GanttChart(FigureCanvas):
                     break
             if clicked_bar:
                 self.show_context_menu(clicked_bar, event)
-        
+
         # For double click, we track release event to measure time difference
         # Store the time of click
         import time
+
         self.last_click_time = time.time()
 
     def on_double_click_release(self, event):
@@ -240,7 +260,11 @@ class GanttChart(FigureCanvas):
         # if last_click_time is set and elapsed time < threshold
         if event.button == 1 and event.inaxes == self.ax:
             import time
-            if self.last_click_time is not None and (time.time() - self.last_click_time) < self.double_click_threshold:
+
+            if (
+                self.last_click_time is not None
+                and (time.time() - self.last_click_time) < self.double_click_threshold
+            ):
                 # Double click detected
                 # Check if clicked on a bar
                 clicked_bar = None
@@ -282,7 +306,12 @@ class GanttChart(FigureCanvas):
             self.last_mouse_x = None
 
     def on_mouse_move(self, event):
-        if self.panning and event.inaxes == self.ax and self.last_mouse_x is not None and event.xdata is not None:
+        if (
+            self.panning
+            and event.inaxes == self.ax
+            and self.last_mouse_x is not None
+            and event.xdata is not None
+        ):
             dx = event.xdata - self.last_mouse_x
             cur_xlim = self.ax.get_xlim()
             self.ax.set_xlim(cur_xlim[0] - dx, cur_xlim[1] - dx)
@@ -294,12 +323,20 @@ class GanttChart(FigureCanvas):
         menu = QMenu()
         process = bar_process[1]
         proc_name = process["Process"]
-        
+
         info_action = menu.addAction(f"Show info for {proc_name}")
-        selected_action = menu.exec_(self.figure.canvas.mapToGlobal(self.figure.canvas.get_tk_widget().mapFromGlobal(self.figure.canvas.cursor().pos())))
+        selected_action = menu.exec_(
+            self.figure.canvas.mapToGlobal(
+                self.figure.canvas.get_tk_widget().mapFromGlobal(
+                    self.figure.canvas.cursor().pos()
+                )
+            )
+        )
         if selected_action == info_action:
             # Just show a simple message in the tooltip or print
-            self.hover_annotation.set_text(f"{proc_name}:\nArrival: {process['Start']}\nFinish: {process['Finish']}")
+            self.hover_annotation.set_text(
+                f"{proc_name}:\nArrival: {process['Start']}\nFinish: {process['Finish']}"
+            )
             self.hover_annotation.set_visible(True)
             self.draw_idle()
 
