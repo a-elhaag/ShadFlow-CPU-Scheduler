@@ -1,7 +1,7 @@
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QIcon, QPalette
+from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication
 
 from ui.main_window import MainWindow
@@ -13,8 +13,6 @@ if __name__ == "__main__":
     dark_palette = QPalette()
     dark_color = QColor(45, 45, 45)
     nearly_black = QColor(35, 35, 35)
-    medium_grey = QColor(90, 90, 90)
-    light_grey = QColor(160, 160, 160)
     white = QColor(255, 255, 255)
     highlight_color = QColor(142, 68, 173)
 
