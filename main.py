@@ -33,7 +33,6 @@ if __name__ == "__main__":
 
     app.setPalette(dark_palette)
 
-
     window = MainWindow()
     window.show()
 

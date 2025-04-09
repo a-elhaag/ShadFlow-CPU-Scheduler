@@ -1,8 +1,8 @@
 import random
 import sys
 
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QAction, QColor, QIcon
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -13,14 +13,12 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QLabel,
     QMainWindow,
-    QMenu,
     QMessageBox,
     QPushButton,
     QSpinBox,
     QTableWidget,
     QTableWidgetItem,
     QToolBar,
-    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -43,12 +41,9 @@ class MainWindow(QMainWindow):
 
         self.left_dock = QDockWidget("Process Input", self)
         self.left_dock.setFeatures(
-            QDockWidget.DockWidgetMovable
-            | QDockWidget.DockWidgetFloatable
-            | QDockWidget.DockWidgetClosable
+            QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable
         )
         self.left_dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.left_dock.visibilityChanged.connect(self.update_view_menu)
 
         dock_content = QWidget()
         dock_layout = QVBoxLayout(dock_content)
@@ -60,22 +55,12 @@ class MainWindow(QMainWindow):
         title_label.setAlignment(Qt.AlignCenter)
         dock_layout.addWidget(title_label, alignment=Qt.AlignCenter)
 
-        github_label = QLabel(
-            '<a href="https://github.com/a-elhaag/ShadFlow-CPU-Scheduler">View on GitHub</a>'
-        )
-        github_label.setOpenExternalLinks(True)
-        github_label.setStyleSheet("font-size: 12px; color: #1E90FF;")
-        github_label.setAlignment(Qt.AlignCenter)
-        dock_layout.addWidget(github_label, alignment=Qt.AlignCenter)
-
         alg_label = QLabel("Select Algorithm:")
         alg_label.setStyleSheet("font-weight: bold; font-size: 14px; color: #FFFFFF;")
         dock_layout.addWidget(alg_label)
 
         self.algorithm_selector = QComboBox()
-        self.algorithm_selector.addItems(
-            ["FCFS", "SJF", "SRTF", "Priority", "Priority (Preemptive)", "Round Robin"]
-        )
+        self.algorithm_selector.addItems(["FCFS", "SRTF", "Priority", "Round Robin"])
         self.algorithm_selector.setStyleSheet("font-size: 13px; color: #000;")
         self.algorithm_selector.currentTextChanged.connect(self.on_algorithm_changed)
         dock_layout.addWidget(self.algorithm_selector)
@@ -120,18 +105,6 @@ class MainWindow(QMainWindow):
                 background-color: #388E3C;
             }
         """
-
-        buttons_layout = QHBoxLayout()
-        add_process_button = QPushButton("Add Process")
-        add_process_button.setStyleSheet(button_style)
-        add_process_button.clicked.connect(self.add_process)
-        buttons_layout.addWidget(add_process_button)
-
-        delete_process_button = QPushButton("Delete Selected")
-        delete_process_button.setStyleSheet(button_style)
-        delete_process_button.clicked.connect(self.delete_selected_process)
-        buttons_layout.addWidget(delete_process_button)
-        dock_layout.addLayout(buttons_layout)
 
         extra_actions_layout = QHBoxLayout()
         fill_sample_button = QPushButton("Random Sample Data")
@@ -215,85 +188,20 @@ class MainWindow(QMainWindow):
             """
         )
 
-        # Create the "Help" menu as a QMenu
-        help_menu = QMenu("Help", self)
-        description_action = QAction("Algorithm Descriptions", self)
-        description_action.triggered.connect(self.show_descriptions)
-        help_menu.addAction(description_action)
-
-        about_action = QAction("About", self)
-        about_action.triggered.connect(self.show_about)
-        help_menu.addAction(about_action)
-
-        # Create a toolbutton for Help menu
-        help_button = QToolButton()
-        help_button.setText("Help")
-        help_button.setPopupMode(QToolButton.InstantPopup)
-        help_button.setMenu(help_menu)
-        toolbar.addWidget(help_button)
-
-        # Create the "View" menu
-        view_menu = QMenu("View", self)
-        self.toggle_input_action = QAction(
-            "Show/Hide Input", self, checkable=True, checked=True
-        )
-        self.toggle_input_action.triggered.connect(self.toggle_input_dock)
-        view_menu.addAction(self.toggle_input_action)
-
-        # Create a toolbutton for View menu
-        view_button = QToolButton()
-        view_button.setText("View")
-        view_button.setPopupMode(QToolButton.InstantPopup)
-        view_button.setMenu(view_menu)
-        toolbar.addWidget(view_button)
-
-        # Add the other actions that were originally in the toolbar
-        refresh_action = QAction("Refresh Data", self)
-        refresh_action.setToolTip("Generate Random Sample Data")
-        refresh_action.triggered.connect(self.fill_random_sample_data)
-        toolbar.addAction(refresh_action)
-
-        generate_action = QAction("Generate", self)
-        generate_action.setToolTip("Generate Schedule")
-        generate_action.triggered.connect(self.generate_schedule)
-        toolbar.addAction(generate_action)
-
-        clear_action = QAction("Clear Table", self)
-        clear_action.setToolTip("Clear all process data")
-        clear_action.triggered.connect(self.clear_table)
-        toolbar.addAction(clear_action)
-
         self.addToolBar(Qt.TopToolBarArea, toolbar)
 
         self.on_algorithm_changed(self.algorithm_selector.currentText())
 
     def on_algorithm_changed(self, algorithm):
-        priority_required = (
-            algorithm == "Priority" or algorithm == "Priority (Preemptive)"
-        )
+        priority_required = algorithm == "Priority"
         self.process_table.setColumnHidden(3, not priority_required)
         self.process_table.setColumnHidden(4, True)
         self.quantum_input.setVisible(algorithm == "Round Robin")
 
-    def add_process(self):
-        row_count = self.process_table.rowCount()
-        self.process_table.insertRow(row_count)
-        self.process_table.setItem(row_count, 0, QTableWidgetItem(f"P{row_count+1}"))
-
-    def delete_selected_process(self):
-        selected_rows = self.process_table.selectionModel().selectedRows()
-        if not selected_rows:
-            QMessageBox.warning(
-                self, "No selection", "Please select a process row to delete."
-            )
-            return
-        for index in sorted(selected_rows, reverse=True):
-            self.process_table.removeRow(index.row())
-
     def fill_random_sample_data(self):
         self.clear_table()
         algorithm = self.algorithm_selector.currentText()
-        num_processes = random.randint(3, 6)
+        num_processes = random.randint(3, 15)
         self.process_table.setRowCount(num_processes)
 
         for i in range(num_processes):
@@ -399,42 +307,6 @@ class MainWindow(QMainWindow):
         )
 
         self.chart.update_chart(schedule, processes)
-
-    def show_about(self):
-        QMessageBox.information(
-            self,
-            "About",
-            "ShadFlow CPU Scheduler Visualizer\n\n"
-            "A powerful tool to visualize CPU scheduling algorithms.\n"
-            "Contribute or view source code at our GitHub repository.",
-        )
-
-    def show_descriptions(self):
-        descriptions = (
-            "<b>FCFS (First-Come, First-Served):</b><br>"
-            "Processes are scheduled in the order they arrive. No preemption.<br><br>"
-            "<b>SJF (Shortest Job First):</b><br>"
-            "Selects the process with the smallest burst time. Non-preemptive, can lead to low waiting time for short processes.<br><br>"
-            "<b>SRTF (Shortest Remaining Time First):</b><br>"
-            "Preemptive version of SJF. Always choose the process with the shortest remaining burst time.<br><br>"
-            "<b>Priority Scheduling:</b><br>"
-            "Processes are scheduled based on priority. The lower the priority number, the higher the priority. Non-preemptive.<br><br>"
-            "<b>Priority (Preemptive):</b><br>"
-            "Higher priority processes can interrupt the current running process.<br><br>"
-            "<b>Round Robin:</b><br>"
-            "Each process gets a small time slice (quantum) and cycles through them fairly.<br><br>"
-        )
-
-        QMessageBox.information(self, "Algorithm Descriptions", descriptions)
-
-    def toggle_input_dock(self):
-        if self.toggle_input_action.isChecked():
-            self.left_dock.show()
-        else:
-            self.left_dock.hide()
-
-    def update_view_menu(self, visible):
-        self.toggle_input_action.setChecked(visible)
 
 
 if __name__ == "__main__":

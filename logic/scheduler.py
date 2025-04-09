@@ -1,7 +1,6 @@
 import random
 from collections import deque
 
-
 class Scheduler:
     def __init__(self, processes, algorithm, quantum=None):
         self.processes = processes
@@ -11,10 +10,8 @@ class Scheduler:
     def run(self):
         algorithms = {
             "FCFS": self.fcfs,
-            "SJF": self.sjf,
             "SRTF": self.srtf,
             "Priority": self.priority,
-            "Priority (Preemptive)": self.priority_preemptive,
             "Round Robin": self.round_robin,
         }
         schedule, _ = algorithms[self.algorithm]()
@@ -57,33 +54,6 @@ class Scheduler:
                 }
             )
             start_time = finish_time
-        return schedule, None
-
-    def sjf(self):
-        schedule = []
-        current_time = 0
-        remaining_processes = sorted(
-            self.processes, key=lambda x: (x["Burst Time"], x["Arrival Time"])
-        )
-        while remaining_processes:
-            available = [
-                p for p in remaining_processes if p["Arrival Time"] <= current_time
-            ]
-            if not available:
-                current_time += 1
-                continue
-            process = min(available, key=lambda x: x["Burst Time"])
-            remaining_processes.remove(process)
-            start = (
-                current_time
-                if current_time >= process["Arrival Time"]
-                else process["Arrival Time"]
-            )
-            finish = start + process["Burst Time"]
-            schedule.append(
-                {"Process": process["Process"], "Start": start, "Finish": finish}
-            )
-            current_time = finish
         return schedule, None
 
     def srtf(self):
@@ -184,43 +154,4 @@ class Scheduler:
             )
             current_time = finish
             processes.remove(current_process)
-        return schedule, None
-
-    def priority_preemptive(self):
-        schedule = []
-        current_time = 0
-        processes = [dict(p, remaining=p["Burst Time"]) for p in self.processes]
-        processes = sorted(processes, key=lambda x: x["Arrival Time"])
-        executed_process = None
-        start_time = None
-
-        while processes:
-            available = [p for p in processes if p["Arrival Time"] <= current_time]
-            if not available:
-                current_time += 1
-                continue
-            current_process = min(available, key=lambda x: x["Priority"])
-            if executed_process != current_process:
-                if executed_process and executed_process["remaining"] > 0:
-                    schedule.append(
-                        {
-                            "Process": executed_process["Process"],
-                            "Start": start_time,
-                            "Finish": current_time,
-                        }
-                    )
-                executed_process = current_process
-                start_time = current_time
-            current_process["remaining"] -= 1
-            current_time += 1
-            if current_process["remaining"] == 0:
-                schedule.append(
-                    {
-                        "Process": current_process["Process"],
-                        "Start": start_time,
-                        "Finish": current_time,
-                    }
-                )
-                processes.remove(current_process)
-                executed_process = None
         return schedule, None
